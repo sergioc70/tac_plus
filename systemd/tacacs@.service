@@ -1,0 +1,21 @@
+[Unit]
+Description=TACACS+ IPv4 Daemon
+After=network-online.target
+Wants=network-online.target
+PartOf=tacacs.target
+
+
+[Service]
+EnvironmentFile=-/etc/default/tacacs-%i
+StandardOutput=null
+ExecStart=/opt/tac_plus/sbin/tac_plus \
+		-G \
+		-C ${CONFIG_FILE} \
+		-B ${BIND_ADDRESS} \
+		-p ${PORT} \
+		$OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target tacacs.target

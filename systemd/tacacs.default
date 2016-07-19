@@ -1,0 +1,13 @@
+# /etc/default/tacacs-master
+
+CONFIG_FILE=<path-to-conf>/tac_plus-master.conf
+
+# bind address used by the tacacs+ daemon
+BIND_ADDRESS=0.0.0.0
+
+# port to use
+PORT=49
+
+# extra options to be passed when starting the daemon
+OPTIONS=
+
