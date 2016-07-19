@@ -42,7 +42,6 @@
 				accounting file = <filename> |
 				accounting syslog |
 				key = <string> |
-				prompt = <string> |
 				logging = <syslog_fac>
 
    <authen_default>	:=	default authentication = file <filename>
@@ -130,6 +129,7 @@ static int sym_ch;				/* current parse character */
 static int sym_code;				/* parser output */
 static int sym_line = 1;			/* current line number */
 static FILE *cf = NULL;				/* config file pointer */
+static FILE *inc_cf = NULL;			/* includer config file pointer */
 static int sym_error = 0;			/* a parsing error occurred */
 static char *authen_default = NULL;	/* top level authentication default */
 static char *nopasswd_str = "nopassword";
@@ -752,7 +752,7 @@ parse_acl(void)
 static int
 parse_decls()
 {
-
+    char *incfile = NULL;
     sym_code = 0;
     rch();
 
@@ -769,7 +769,34 @@ parse_decls()
     while (1) {
 
 	switch (sym_code) {
+	case S_include:
+	    sym_get();
+	    parse(S_separator);
+	    if (incfile != NULL)
+		free(incfile);
+	    incfile = tac_strdup(sym_buf);
+	    if (inc_cf) {
+		report(LOG_ERR, "cannot yet include config recursively");
+		return(1);
+	    }
+	    inc_cf = cf;
+	    if ((cf = fopen(incfile, "r")) == NULL) {
+		report(LOG_ERR, "read_config: fopen() error for include file %s %s, exiting",
+		       incfile, strerror(errno));
+		return(1);
+	    }
+	    sym_get();
+	    continue;
+	    
 	case S_eof:
+	    if (inc_cf != NULL) {
+		fclose(cf);
+		cf = inc_cf;
+		inc_cf = NULL;
+		rch();
+	        sym_get();
+		continue;
+	    }
 	    return(0);
 
 	case S_accounting:

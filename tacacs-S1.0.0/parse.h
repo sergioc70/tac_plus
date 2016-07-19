@@ -91,3 +91,4 @@
 #endif
 #define	S_syslog	50
 #define S_aceclnt	51
+#define S_include	52

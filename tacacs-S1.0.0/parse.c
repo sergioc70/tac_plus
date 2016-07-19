@@ -121,6 +121,7 @@ parser_init(void)
     declare("PAM", S_pam);
 #endif
     declare("syslog", S_syslog);
+    declare("include", S_include);
 }
 
 /* Return a keyword code if a keyword is recognized. 0 otherwise */
@@ -266,5 +267,7 @@ codestring(int type)
 #endif
     case S_syslog:
 	return("syslog");
+    case S_include:
+	return("include");
     }
 }
