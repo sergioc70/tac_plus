@@ -238,7 +238,12 @@ choose(struct authen_data *datap, struct authen_type *typep)
 		}
 
 		if (prompt == NULL) {
-		    prompt = "\nUser Access Verification\n\nUsername: ";
+		    if (session.prompt != NULL) {
+			prompt = session.prompt;
+                    }
+		    else {
+			prompt = "\nUser Access Verification\n\nUsername: ";
+		    }
 		}
 	    } else {
 		prompt = "Username: ";

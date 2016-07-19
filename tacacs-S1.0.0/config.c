@@ -42,6 +42,7 @@
 				accounting file = <filename> |
 				accounting syslog |
 				key = <string> |
+				prompt = <string> |
 				logging = <syslog_fac>
 
    <authen_default>	:=	default authentication = file <filename>
@@ -524,6 +525,11 @@ cfg_clean_config(void)
 	authen_default = NULL;
     }
 
+    if (session.prompt) {
+	free(session.prompt);
+	session.prompt = NULL;
+    }
+
     if (session.key) {
 	free(session.key);
 	session.key = NULL;
@@ -807,6 +813,20 @@ parse_decls()
 		sym_get();
 		continue;
 	    }
+
+	case S_prompt:
+	    /* Process a prompt declaration. */
+	    sym_get();
+	    parse(S_separator);
+	    if (session.prompt) {
+		parse_error("multiply defined prompt on lines %d and %d",
+			    session.promptline, sym_line);
+		return(1);
+	    }
+	    session.prompt = tac_strdup(sym_buf);
+	    session.promptline = sym_line;
+	    sym_get();
+	    continue;
 
 	case S_key:
 	    /* Process a key declaration. */
@@ -1569,14 +1589,13 @@ next:
 		rch();
 		switch (sym_ch) {
 		case 'n':
-		    /* preserve the slash for \n */
-		    if (!sym_buf_add('\\')) {
+		    if (!sym_buf_add('\n')) {
 			sym_code = S_unknown;
 			rch();
 			return;
 		    }
-
-		    /* fall through */
+		    rch();
+		    continue;
 		case '"':
 		case '\\':
 		    if (!sym_buf_add(sym_ch)) {

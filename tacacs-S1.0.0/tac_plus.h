@@ -192,6 +192,8 @@ struct session {
 #define SESS_FLAG_ACCTSYSL	0x1		/* syslog accounting records */
 #define SESS_NO_SINGLECONN	0x2		/* single-connect not allowed*/
     int peerflags;		   /* header flags from client */
+    char *prompt;                     /* the prompt */
+    int promptline;                   /* line number prompt was found on */
     char *key;                     /* the key */
     int keyline;                   /* line number key was found on */
     char *peer;                    /* name of connected peer */
